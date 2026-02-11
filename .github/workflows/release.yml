@@ -14,4 +14,5 @@ jobs:
       - name: Notify Packagist
         run: |
           curl -s -X POST "https://packagist.org/api/update-package?username=wbridgett&apiToken=${{ secrets.PACKAGIST_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
             -d '{"repository":{"url":"https://packagist.org/packages/pdfparse/flatpdf"}}'
