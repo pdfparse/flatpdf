@@ -32,7 +32,7 @@ FlatPdf writes PDF operators directly. No HTML parsing, no CSS rendering engine,
 composer require pdfparse/flatpdf
 ```
 
-Requires PHP 8.1+.
+Requires PHP 8.2+.
 
 ## Quick Start
 
