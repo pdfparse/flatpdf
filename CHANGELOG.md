@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com), and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased]
+## [0.1.1] - 2025-02-11
+
+### Fixed
+
+- Table rows after the first on each page rendering invisible due to `drawRect()` changing the PDF fill color without invalidating the cached text color state
+- `{pages}` total page count placeholder showing literal `___TOTAL_PAGES___` when stream compression is enabled, by deferring compression until after placeholder replacement in `output()`
+- Replaced UTF-8 em dashes in demo with ASCII dashes to avoid garbled output with WinAnsiEncoding Type1 fonts
 
 ## [0.1.0] - 2025-02-11
 

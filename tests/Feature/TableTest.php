@@ -122,6 +122,24 @@ describe('Tables', function () {
             expect(str_contains($output, '0.95 0.96 0.98 rg'))->toBeTrue();
         });
 
+        it('emits text color for every row after background fill', function () {
+            $style = new Style(compress: false, textColor: [0.2, 0.2, 0.2]);
+            $pdf = new FlatPdf($style);
+            $pdf->table(['Name'], [['Alice'], ['Bob'], ['Charlie']]);
+            $output = $pdf->output();
+
+            // Each row's text must have its color re-emitted after drawRect
+            // changes the fill color for the row background. Count text color
+            // emissions — should be at least once per data row (3).
+            $textColorCount = substr_count($output, '0.2 0.2 0.2 rg');
+            expect($textColorCount)->toBeGreaterThanOrEqual(3);
+
+            // All three row values must be present in the output
+            expect(str_contains($output, '(Alice)'))->toBeTrue();
+            expect(str_contains($output, '(Bob)'))->toBeTrue();
+            expect(str_contains($output, '(Charlie)'))->toBeTrue();
+        });
+
         it('renders with center alignment', function () {
             $pdf = new FlatPdf($this->style);
             $pdf->table(['A', 'B'], [['1', '2']], [

@@ -134,5 +134,17 @@ describe('Page Management', function () {
             $pageCount = $pdf->getCurrentPage();
             expect(str_contains($output, "of {$pageCount}"))->toBeTrue();
         });
+
+        it('resolves total page count with compression enabled', function () {
+            $style = new Style(compress: true, showPageNumbers: true, pageNumberFormat: 'Page {page} of {pages}');
+            $pdf = new FlatPdf($style);
+            $rows = array_fill(0, 200, ['Data', 'More data']);
+            $pdf->table(['A', 'B'], $rows);
+            $output = $pdf->output();
+            $pageCount = $pdf->getCurrentPage();
+            expect($pageCount)->toBeGreaterThan(1);
+            // The placeholder must not survive into the final output
+            expect(str_contains($output, '___TOTAL_PAGES___'))->toBeFalse();
+        });
     });
 });

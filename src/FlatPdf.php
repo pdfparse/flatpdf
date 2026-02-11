@@ -46,6 +46,8 @@ class FlatPdf
     /** @var list<float> */
     private array $activeColor = [0, 0, 0];
     private bool $documentFinished = false;
+    /** @var array<int, string> Raw page streams keyed by content object ID, compressed in output(). */
+    private array $pageStreams = [];
 
     // Image tracking
     /** @var array<string, array{objId: int, width: int, height: int, name: string}> */
@@ -119,16 +121,8 @@ class FlatPdf
     {
         $this->renderHeaderFooter();
 
-        $stream = $this->currentPageStream;
-
-        if ($this->style->compress) {
-            $compressed = gzcompress($stream) ?: '';
-            $length = strlen($compressed);
-            $this->doc->setObject($this->currentContentObjId, "<< /Length {$length} /Filter /FlateDecode >>\nstream\n{$compressed}\nendstream");
-        } else {
-            $length = strlen($stream);
-            $this->doc->setObject($this->currentContentObjId, "<< /Length {$length} >>\nstream\n{$stream}\nendstream");
-        }
+        // Store raw stream; compression + placeholder replacement happen in output().
+        $this->pageStreams[$this->currentContentObjId] = $this->currentPageStream;
 
         $w = $this->style->pageWidth;
         $h = $this->style->pageHeight;
@@ -636,6 +630,7 @@ class FlatPdf
     {
         $this->currentPageStream .= "{$this->colorStr($fillColor)} rg\n";
         $this->currentPageStream .= "{$this->fmt($x)} {$this->fmt($y)} {$this->fmt($w)} {$this->fmt($h)} re f\n";
+        $this->activeColor = [-1.0, -1.0, -1.0];
     }
 
     /**
@@ -906,8 +901,22 @@ class FlatPdf
             $this->documentFinished = true;
         }
 
-        $pdf = $this->doc->output();
-        return str_replace('___TOTAL_PAGES___', (string)$this->pageCount, $pdf);
+        $totalPages = (string)$this->pageCount;
+
+        foreach ($this->pageStreams as $contentObjId => $stream) {
+            $stream = str_replace('___TOTAL_PAGES___', $totalPages, $stream);
+
+            if ($this->style->compress) {
+                $compressed = gzcompress($stream) ?: '';
+                $length = strlen($compressed);
+                $this->doc->setObject($contentObjId, "<< /Length {$length} /Filter /FlateDecode >>\nstream\n{$compressed}\nendstream");
+            } else {
+                $length = strlen($stream);
+                $this->doc->setObject($contentObjId, "<< /Length {$length} >>\nstream\n{$stream}\nendstream");
+            }
+        }
+
+        return $this->doc->output();
     }
 
     /** Save the PDF to a file path. */

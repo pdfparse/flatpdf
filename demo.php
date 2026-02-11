@@ -20,7 +20,7 @@ use PdfParse\FlatPdf\Style;
 // ─── Create a styled writer ─────────────────────────────────────────────
 
 $style = new Style(
-    headerText: 'Acme Corp — Q4 2025 Financial Report',
+    headerText: 'Acme Corp - Q4 2025 Financial Report',
     footerText: 'CONFIDENTIAL',
     tableHeaderBg: [0.18, 0.33, 0.59],
 );
@@ -32,7 +32,7 @@ $pdf = new FlatPdf($style);
 $pdf->space(180);
 $pdf->h1('Q4 2025 Financial Report');
 $pdf->space(10);
-$pdf->text('Prepared by the Finance Department — January 2026');
+$pdf->text('Prepared by the Finance Department - January 2026');
 $pdf->text('Acme Corporation | Internal Use Only');
 $pdf->space(40);
 $pdf->text(
@@ -327,7 +327,7 @@ if (function_exists('imagecreatetruecolor')) {
 
     unlink($testJpegPath);
 } else {
-    $pdf->text('(GD extension not available — skipping image demo. Images still work with any JPEG file.)');
+    $pdf->text('(GD extension not available - skipping image demo. Images still work with any JPEG file.)');
 }
 
 $pdf->space(12);
@@ -341,7 +341,7 @@ $pdf->save($outputPath);
 
 // Also generate an uncompressed version for size comparison
 $styleUncompressed = new Style(
-    headerText: 'Acme Corp — Q4 2025 Financial Report',
+    headerText: 'Acme Corp - Q4 2025 Financial Report',
     footerText: 'CONFIDENTIAL',
     tableHeaderBg: [0.18, 0.33, 0.59],
     compress: false,

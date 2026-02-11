@@ -58,6 +58,15 @@ describe('Text Rendering', function () {
             expect(str_contains($output, '(Custom)'))->toBeTrue();
             expect(str_contains($output, '1 0 0 rg'))->toBeTrue();
         });
+
+        it('renders ASCII dashes without garbled multi-byte output', function () {
+            $pdf = new FlatPdf($this->style);
+            $pdf->text('Acme Corp - Q4 Report');
+            $output = $pdf->output();
+            expect(str_contains($output, '(Acme Corp - Q4 Report)'))->toBeTrue();
+            // UTF-8 em dash bytes (0xE2 0x80 0x94) must not appear in the stream
+            expect(str_contains($output, "\xE2\x80\x94"))->toBeFalse();
+        });
     });
 
     describe('bold()', function () {

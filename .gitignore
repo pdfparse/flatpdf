@@ -3,3 +3,5 @@ composer.lock
 /.phpstan-cache/
 /.phpunit.cache/
 .DS_Store
+demo-report-uncompressed.pdf
+demo-report.pdf
