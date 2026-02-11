@@ -1,0 +1,46 @@
+{
+    "name": "pdfparse/flatpdf",
+    "description": "A flat, zero-dependency PHP PDF writer built for speed and large documents.",
+    "keywords": ["pdf", "pdf-writer", "pdf-generator", "tables", "reports", "no-dependencies"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "PDFParse",
+            "homepage": "https://pdfparse.co"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "phpstan/phpstan": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PdfParse\\FlatPdf\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PdfParse\\FlatPdf\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "test:coverage": "pest --coverage",
+        "analyse": "phpstan analyse",
+        "qa": [
+            "@test",
+            "@analyse"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

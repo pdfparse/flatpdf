@@ -1,0 +1,17 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  packagist:
+    runs-on: ubuntu-latest
+    name: Update Packagist
+
+    steps:
+      - name: Notify Packagist
+        run: |
+          curl -s -X POST "https://packagist.org/api/update-package?username=pdfparse&apiToken=${{ secrets.PACKAGIST_API_TOKEN }}" \
+            -d '{"repository":{"url":"https://packagist.org/packages/pdfparse/flatpdf"}}'
