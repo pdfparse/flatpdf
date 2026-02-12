@@ -224,4 +224,33 @@ describe('FontMetrics', function () {
             expect(count($lines))->toBeGreaterThan(1);
         });
     });
+
+    describe('UTF-8 encoding in metrics', function () {
+        it('measures converted width for text with em dash', function () {
+            // "A—B" in UTF-8 is 5 bytes but 3 Windows-1252 characters
+            $width = FontMetrics::stringWidth("A\xE2\x80\x94B", 'Helvetica', 12.0);
+            $widthA = FontMetrics::stringWidth('A', 'Helvetica', 12.0);
+            $widthB = FontMetrics::stringWidth('B', 'Helvetica', 12.0);
+            // Width should be 3 chars worth, not 5 bytes worth
+            expect($width)->toBeLessThan(($widthA + $widthB) * 3);
+        });
+
+        it('word wraps UTF-8 text and returns Windows-1252 output', function () {
+            $text = "caf\xC3\xA9 latt\xC3\xA9";
+            $lines = FontMetrics::wordWrap($text, 'Helvetica', 10.0, 500.0);
+            expect($lines)->toHaveCount(1);
+            expect($lines[0])->toBe("caf\xE9 latt\xE9");
+        });
+
+        it('uses specific widths for extended Win-1252 characters', function () {
+            // Euro sign should use the specific width (556), not the default
+            $euroWidth = FontMetrics::charWidth("\x80", 'Helvetica');
+            $defaultWidth = 556;
+            expect($euroWidth)->toBe($defaultWidth);
+
+            // Em dash should use specific width (1000), not default (556)
+            $emDashWidth = FontMetrics::charWidth("\x97", 'Helvetica');
+            expect($emDashWidth)->toBe(1000);
+        });
+    });
 });

@@ -233,6 +233,8 @@ class FlatPdf
 
     private function escape(string $text): string
     {
+        $text = Encoding::toWin1252($text);
+
         return str_replace(
             ['\\', '(', ')'],
             ['\\\\', '\\(', '\\)'],

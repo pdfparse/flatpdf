@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com), and this project adheres to [Semantic Versioning](https://semver.org).
 
+## [0.1.2] - 2025-02-11
+
+### Added
+
+- `Encoding` class for automatic UTF-8 to Windows-1252 conversion — characters like `€`, `²`, `°`, `—`, `©`, `£`, accented letters now render correctly instead of appearing garbled
+- Extended character width metrics for Helvetica and Helvetica-Bold (Euro, em/en dash, smart quotes, bullet, trademark, copyright, degree, superscripts, and more)
+
+### Fixed
+
+- UTF-8 multi-byte characters (e.g. `²` → `Â²`, `€` → `â‚¬`, `—` → `â€"`) now automatically convert to correct single-byte WinAnsiEncoding before entering the PDF stream
+- Word-wrap and column width calculations now use correct single-byte widths for non-ASCII characters
+- Characters outside the Windows-1252 range (e.g. `₹`, emoji) gracefully degrade to `?` instead of producing garbled bytes
+
 ## [0.1.1] - 2025-02-11
 
 ### Fixed

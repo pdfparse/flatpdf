@@ -32,6 +32,26 @@ class FontMetrics
             's' => 500, 't' => 278, 'u' => 556, 'v' => 500, 'w' => 722, 'x' => 500,
             'y' => 500, 'z' => 500,
             '{' => 334, '|' => 260, '}' => 334, '~' => 584,
+            // Windows-1252 extended characters (0x80-0xFF)
+            "\x80" => 556,  // € Euro sign
+            "\x85" => 1000, // … Ellipsis
+            "\x91" => 222,  // ' Left single quote
+            "\x92" => 222,  // ' Right single quote
+            "\x93" => 333,  // " Left double quote
+            "\x94" => 333,  // " Right double quote
+            "\x95" => 350,  // • Bullet
+            "\x96" => 556,  // – En dash
+            "\x97" => 1000, // — Em dash
+            "\x99" => 1000, // ™ Trademark
+            "\xA3" => 556,  // £ Pound
+            "\xA5" => 556,  // ¥ Yen
+            "\xA9" => 737,  // © Copyright
+            "\xAE" => 737,  // ® Registered
+            "\xB0" => 400,  // ° Degree
+            "\xB2" => 333,  // ² Superscript 2
+            "\xB3" => 333,  // ³ Superscript 3
+            "\xD7" => 584,  // × Multiplication
+            "\xF7" => 584,  // ÷ Division
         ],
         'Helvetica-Bold' => [
             'default' => 556,
@@ -54,6 +74,26 @@ class FontMetrics
             's' => 556, 't' => 333, 'u' => 611, 'v' => 556, 'w' => 778, 'x' => 556,
             'y' => 556, 'z' => 500,
             '{' => 389, '|' => 280, '}' => 389, '~' => 584,
+            // Windows-1252 extended characters (0x80-0xFF)
+            "\x80" => 556,  // € Euro sign
+            "\x85" => 1000, // … Ellipsis
+            "\x91" => 238,  // ' Left single quote
+            "\x92" => 238,  // ' Right single quote
+            "\x93" => 500,  // " Left double quote
+            "\x94" => 500,  // " Right double quote
+            "\x95" => 350,  // • Bullet
+            "\x96" => 556,  // – En dash
+            "\x97" => 1000, // — Em dash
+            "\x99" => 1000, // ™ Trademark
+            "\xA3" => 556,  // £ Pound
+            "\xA5" => 556,  // ¥ Yen
+            "\xA9" => 737,  // © Copyright
+            "\xAE" => 737,  // ® Registered
+            "\xB0" => 400,  // ° Degree
+            "\xB2" => 333,  // ² Superscript 2
+            "\xB3" => 333,  // ³ Superscript 3
+            "\xD7" => 584,  // × Multiplication
+            "\xF7" => 584,  // ÷ Division
         ],
         'Helvetica-Oblique' => [
             'default' => 556,
@@ -170,6 +210,7 @@ class FontMetrics
 
     public static function stringWidth(string $text, string $fontName, float $fontSize): float
     {
+        $text = Encoding::toWin1252($text);
         $width = 0;
         $len = strlen($text);
         for ($i = 0; $i < $len; $i++) {
@@ -181,6 +222,8 @@ class FontMetrics
     /** @return list<string> */
     public static function wordWrap(string $text, string $fontName, float $fontSize, float $maxWidth): array
     {
+        $text = Encoding::toWin1252($text);
+
         if ($maxWidth <= 0) {
             return [$text];
         }

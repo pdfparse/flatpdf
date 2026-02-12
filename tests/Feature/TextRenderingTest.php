@@ -69,6 +69,62 @@ describe('Text Rendering', function () {
         });
     });
 
+    describe('UTF-8 encoding conversion', function () {
+        it('converts UTF-8 em dash to single byte in PDF stream', function () {
+            $pdf = new FlatPdf($this->style);
+            $pdf->text("Value \xE2\x80\x94 100");
+            $output = $pdf->output();
+            expect(str_contains($output, "\xE2\x80\x94"))->toBeFalse();
+            expect(str_contains($output, "\x97"))->toBeTrue();
+        });
+
+        it('converts UTF-8 Euro sign in PDF stream', function () {
+            $pdf = new FlatPdf($this->style);
+            $pdf->text("\xE2\x82\xAC" . "500");
+            $output = $pdf->output();
+            expect(str_contains($output, "\x80" . "500"))->toBeTrue();
+        });
+
+        it('converts superscript characters in PDF stream', function () {
+            $pdf = new FlatPdf($this->style);
+            $pdf->text("Area (km\xC2\xB2)");
+            $output = $pdf->output();
+            expect(str_contains($output, "km\xB2"))->toBeTrue();
+            expect(str_contains($output, "\xC2\xB2"))->toBeFalse();
+        });
+
+        it('handles accented characters in headings', function () {
+            $pdf = new FlatPdf($this->style);
+            $pdf->h1("Caf\xC3\xA9 Report");
+            $output = $pdf->output();
+            expect(str_contains($output, "Caf\xE9 Report"))->toBeTrue();
+        });
+
+        it('handles UTF-8 text in table cells', function () {
+            $pdf = new FlatPdf($this->style);
+            $pdf->table(
+                ['Item', 'Price'],
+                [["Widget\xE2\x84\xA2", "\xE2\x82\xAC" . "10.00"]]
+            );
+            $output = $pdf->output();
+            expect(str_contains($output, "Widget\x99"))->toBeTrue();
+            expect(str_contains($output, "\x80" . "10.00"))->toBeTrue();
+        });
+
+        it('handles UTF-8 text in header and footer', function () {
+            $style = new Style(
+                compress: false,
+                headerText: "\xC2\xA9 2024 Acme",
+                footerText: "Confidential \xE2\x80\x94 Internal",
+            );
+            $pdf = new FlatPdf($style);
+            $pdf->text('Content');
+            $output = $pdf->output();
+            expect(str_contains($output, "\xA9 2024 Acme"))->toBeTrue();
+            expect(str_contains($output, "Confidential \x97 Internal"))->toBeTrue();
+        });
+    });
+
     describe('bold()', function () {
         it('renders text using the bold font variant', function () {
             $pdf = new FlatPdf($this->style);
