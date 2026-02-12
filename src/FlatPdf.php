@@ -56,6 +56,12 @@ class FlatPdf
     /** @var list<string> */
     private array $pageImages = [];
 
+    /** Static factory — Laravel-style constructor. */
+    public static function make(?Style $style = null): self
+    {
+        return new self($style);
+    }
+
     public function __construct(?Style $style = null)
     {
         $this->style = $style ?? new Style();

@@ -110,6 +110,29 @@ describe('Style', function () {
         });
     });
 
+    describe('make()', function () {
+        it('creates a default style with no arguments', function () {
+            $style = Style::make();
+            expect($style->pageWidth)->toBe(612.0);
+            expect($style->pageHeight)->toBe(792.0);
+            expect($style->fontSize)->toBe(9.0);
+        });
+
+        it('accepts named arguments like the constructor', function () {
+            $style = Style::make(fontSize: 14, headerText: 'Test', compress: false);
+            expect($style->fontSize)->toBe(14.0);
+            expect($style->headerText)->toBe('Test');
+            expect($style->compress)->toBeFalse();
+        });
+
+        it('returns the same result as the constructor', function () {
+            $fromNew = new Style(pageWidth: 500, marginTop: 80);
+            $fromMake = Style::make(pageWidth: 500, marginTop: 80);
+            expect($fromMake->pageWidth)->toBe($fromNew->pageWidth);
+            expect($fromMake->marginTop)->toBe($fromNew->marginTop);
+        });
+    });
+
     describe('factory methods', function () {
         describe('compact()', function () {
             it('uses smaller font sizes', function () {

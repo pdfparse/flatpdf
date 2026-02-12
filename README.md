@@ -40,7 +40,7 @@ Requires PHP 8.2+.
 use PdfParse\FlatPdf\FlatPdf;
 use PdfParse\FlatPdf\Style;
 
-$pdf = new FlatPdf();
+$pdf = FlatPdf::make();
 
 $pdf->h1('Monthly Report');
 $pdf->text('Generated on ' . date('Y-m-d'));
@@ -64,19 +64,19 @@ $pdf->save('report.pdf');
 
 ```php
 // Dense layout — maximum data per page
-$pdf = new FlatPdf(Style::compact());
+$pdf = FlatPdf::make(Style::compact());
 
 // A4 paper
-$pdf = new FlatPdf(Style::a4());
+$pdf = FlatPdf::make(Style::a4());
 
 // Landscape — great for wide tables
-$pdf = new FlatPdf(Style::landscape());
+$pdf = FlatPdf::make(Style::landscape());
 
 // Landscape + compact — maximum columns
-$pdf = new FlatPdf(Style::landscapeCompact());
+$pdf = FlatPdf::make(Style::landscapeCompact());
 
 // Custom style
-$pdf = new FlatPdf(new Style(
+$pdf = FlatPdf::make(Style::make(
     headerText: 'Acme Corp — Confidential',
     footerText: 'Internal Use Only',
     tableHeaderBg: [0.18, 0.33, 0.59],
@@ -252,7 +252,7 @@ use Illuminate\Support\Facades\Storage;
 
 public function generateReport()
 {
-    $pdf = new FlatPdf();
+    $pdf = FlatPdf::make();
 
     // Load images from S3
     $pdf->imageFromDisk(Storage::disk('s3'), 'assets/logo.jpg', width: 150);
@@ -278,7 +278,7 @@ public function generateReport()
 All `Style` properties with defaults:
 
 ```php
-new Style(
+Style::make(
     // Page dimensions (points: 72 points = 1 inch)
     pageWidth: 612,          // Letter width (A4: 595.28)
     pageHeight: 792,         // Letter height (A4: 841.89)
@@ -338,10 +338,10 @@ Stream compression is enabled by default. Content streams are compressed with `g
 
 ```php
 // Compression is on by default — nothing to do
-$pdf = new FlatPdf();
+$pdf = FlatPdf::make();
 
 // Disable if you need readable PDF internals for debugging
-$pdf = new FlatPdf(new Style(compress: false));
+$pdf = FlatPdf::make(Style::make(compress: false));
 ```
 
 JPEG image streams are never double-compressed — they use DCTDecode only.

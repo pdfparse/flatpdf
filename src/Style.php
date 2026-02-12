@@ -72,6 +72,20 @@ class Style
     ) {
     }
 
+    /**
+     * Static factory — Laravel-style constructor.
+     *
+     * Accepts the same named arguments as the constructor.
+     *
+     * @param mixed ...$args
+     * @phpstan-param array<string, mixed> $args
+     */
+    public static function make(mixed ...$args): self
+    {
+        /** @phpstan-ignore argument.type */
+        return new self(...$args);
+    }
+
     /** Dense layout for maximum data per page. */
     public static function compact(): self
     {

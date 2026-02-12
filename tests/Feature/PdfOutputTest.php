@@ -7,6 +7,32 @@ use PdfParse\FlatPdf\Style;
 
 describe('PDF Output', function () {
 
+    describe('make()', function () {
+        it('creates a FlatPdf instance with no arguments', function () {
+            $pdf = FlatPdf::make();
+            expect($pdf)->toBeInstanceOf(FlatPdf::class);
+            expect($pdf->getCurrentPage())->toBe(1);
+        });
+
+        it('creates a FlatPdf instance with a style', function () {
+            $pdf = FlatPdf::make(Style::compact());
+            expect($pdf)->toBeInstanceOf(FlatPdf::class);
+            expect($pdf->getCurrentPage())->toBe(1);
+        });
+
+        it('produces identical output to constructor', function () {
+            $style = new Style(compress: false);
+
+            $fromNew = new FlatPdf($style);
+            $fromNew->text('Hello');
+
+            $fromMake = FlatPdf::make($style);
+            $fromMake->text('Hello');
+
+            expect($fromMake->output())->toBe($fromNew->output());
+        });
+    });
+
     describe('output()', function () {
         it('produces valid PDF header', function () {
             $output = (new FlatPdf())->output();

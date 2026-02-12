@@ -19,13 +19,13 @@ use PdfParse\FlatPdf\Style;
 
 // ─── Create a styled writer ─────────────────────────────────────────────
 
-$style = new Style(
+$style = Style::make(
     headerText: 'Acme Corp - Q4 2025 Financial Report',
     footerText: 'CONFIDENTIAL',
     tableHeaderBg: [0.18, 0.33, 0.59],
 );
 
-$pdf = new FlatPdf($style);
+$pdf = FlatPdf::make($style);
 
 // ─── Title Page ─────────────────────────────────────────────────────────
 
