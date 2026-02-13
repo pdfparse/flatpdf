@@ -10,6 +10,7 @@
             "homepage": "https://pdfparse.co"
         }
     ],
+    "homepage": "https://flatpdf.pdfparse.co/",
     "require": {
         "php": "^8.2"
     },

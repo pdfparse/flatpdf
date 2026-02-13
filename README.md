@@ -2,7 +2,7 @@
 
 A flat, zero-dependency PHP PDF writer built for speed and large documents.
 
-Built by [PdfParse](https://pdfparse.co).
+Built by [PdfParse](https://pdfparse.co). [Documentation](https://flatpdf.pdfparse.co/)
 
 ## Why FlatPdf?
 
