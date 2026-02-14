@@ -1,0 +1,472 @@
+# FlatPDF — Complete API Reference
+
+> A flat, zero-dependency PHP PDF writer built for speed and large documents.
+
+Package: `pdfparse/flatpdf`
+Requires: PHP 8.2+
+License: MIT
+Docs: https://flatpdf.pdfparse.co/
+
+---
+
+## Installation
+
+```bash
+composer require pdfparse/flatpdf
+```
+
+## Quick Start
+
+```php
+use PdfParse\FlatPdf\FlatPdf;
+use PdfParse\FlatPdf\Style;
+
+$pdf = FlatPdf::make();
+
+$pdf->h1('Monthly Report');
+$pdf->text('Generated on ' . date('Y-m-d'));
+
+$pdf->table(
+    headers: ['Product', 'Revenue', 'Margin'],
+    rows: [
+        ['Widget A', '$12,400', '34%'],
+        ['Widget B', '$8,200', '41%'],
+        ['Widget C', '$15,800', '28%'],
+    ],
+    options: [
+        'columnAligns' => ['left', 'right', 'right'],
+    ]
+);
+
+$pdf->save('report.pdf');
+```
+
+Both `FlatPdf::make()` and `new FlatPdf()` are supported. The static factory is recommended. The same applies to `Style::make()` vs `new Style()`.
+
+---
+
+## Text & Headings
+
+### Headings
+
+```php
+$pdf->h1('Large Heading');     // Default 20pt, with underline
+$pdf->h2('Medium Heading');    // Default 15pt
+$pdf->h3('Small Heading');     // Default 12pt
+```
+
+### Body Text
+
+```php
+$pdf->text('Regular body text with word wrapping.');
+
+// With overrides
+$pdf->text('Custom styled text', font: 'Courier', size: 12, color: [0.5, 0.0, 0.0]);
+```
+
+### Styled Text
+
+```php
+$pdf->bold('Bold text');
+$pdf->italic('Italic text');
+$pdf->code('Monospaced code text');
+
+// Optional size and color
+$pdf->bold('Large bold', size: 14);
+$pdf->italic('Red italic', color: [0.8, 0.0, 0.0]);
+```
+
+### Spacing & Separators
+
+```php
+$pdf->space(20);    // Add 20 points of vertical space
+$pdf->hr();         // Horizontal rule across the content width
+```
+
+### Available Fonts
+
+The 14 standard PDF fonts (no embedding required):
+
+- Helvetica, Helvetica-Bold, Helvetica-Oblique, Helvetica-BoldOblique
+- Times-Roman, Times-Bold, Times-Italic, Times-BoldItalic
+- Courier, Courier-Bold, Courier-Oblique, Courier-BoldOblique
+
+Aliases: `arial`, `sans-serif`, `serif`, `monospace`
+
+---
+
+## Tables
+
+### Basic Table
+
+```php
+$pdf->table(
+    headers: ['Name', 'Email', 'Role'],
+    rows: [
+        ['Alice Johnson', 'alice@example.com', 'Admin'],
+        ['Bob Smith', 'bob@example.com', 'Editor'],
+    ]
+);
+```
+
+### Table Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `columnAligns` | string[] | all 'left' | 'left', 'center', or 'right' per column |
+| `columnWidths` | float[] | auto | Explicit widths in points |
+| `columnMinWidths` | float[] | [] | Minimum width per column |
+| `maxColumnWidth` | float | 50% content | Cap width for any column |
+| `fontSize` | float | Style default | Override font size for this table |
+| `striped` | bool | true | Alternating row background colors |
+| `repeatHeader` | bool | true | Repeat headers on page breaks |
+
+### Column Alignment
+
+```php
+$pdf->table(
+    headers: ['Product', 'Quantity', 'Price', 'Total'],
+    rows: $rows,
+    options: [
+        'columnAligns' => ['left', 'right', 'right', 'right'],
+        'striped' => true,
+        'repeatHeader' => true,
+    ]
+);
+```
+
+### Multi-Page Tables
+
+When a table spans multiple pages, FlatPDF automatically:
+
+- Breaks cleanly between rows (never mid-row)
+- Repeats headers on each new page (when `repeatHeader` is true)
+- Maintains striping continuity across pages
+
+### Summary Row
+
+```php
+$colWidths = $pdf->table($headers, $rows);
+
+$pdf->summaryRow(
+    values: ['', '', 'Total:', '$36,400'],
+    colWidths: $colWidths,
+    options: ['columnAligns' => ['left', 'left', 'right', 'right']]
+);
+```
+
+The `table()` method returns the calculated column widths, which you can pass to `summaryRow()` for alignment.
+
+---
+
+## Data Tables
+
+The `dataTable()` method accepts associative arrays or Eloquent collections.
+
+### Basic Usage
+
+```php
+$users = [
+    ['name' => 'Alice', 'email' => 'alice@example.com', 'role' => 'Admin'],
+    ['name' => 'Bob', 'email' => 'bob@example.com', 'role' => 'Editor'],
+];
+
+$pdf->dataTable($users);
+```
+
+Without options, all keys from the first record are used as columns.
+
+### With Options
+
+```php
+$pdf->dataTable($users, [
+    'columns' => ['name', 'email', 'created_at', 'subscription_amount'],
+    'columnLabels' => [
+        'name' => 'Full Name',
+        'created_at' => 'Joined',
+        'subscription_amount' => 'MRR',
+    ],
+    'formatters' => [
+        'created_at' => fn($v) => date('M j, Y', strtotime($v)),
+        'subscription_amount' => fn($v) => '$' . number_format($v / 100, 2),
+    ],
+    'columnAligns' => ['left', 'left', 'center', 'right'],
+]);
+```
+
+### Data Table Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `columns` | string[] | Which keys to include; defaults to all keys from first record |
+| `columnLabels` | array<string, string> | Custom display labels per column key |
+| `formatters` | array<string, callable> | Value formatters per column key |
+| + all table() options | — | striped, repeatHeader, columnAligns, etc. pass through |
+
+### Eloquent Integration
+
+```php
+$users = User::all()->toArray();
+
+$pdf->dataTable($users, [
+    'columns' => ['name', 'email', 'created_at'],
+    'columnLabels' => ['created_at' => 'Joined'],
+    'formatters' => [
+        'created_at' => fn($v) => Carbon::parse($v)->format('M j, Y'),
+    ],
+]);
+```
+
+---
+
+## Images
+
+JPEG images only. Images are embedded directly as DCTDecode streams — no re-encoding, no GD dependency.
+
+### From File Path
+
+```php
+$pdf->image('/path/to/photo.jpg', width: 300);
+$pdf->image('/path/to/photo.jpg', width: 300, height: 200);
+```
+
+### From Raw Bytes
+
+```php
+$jpeg = file_get_contents('https://example.com/photo.jpg');
+$pdf->imageFromString($jpeg, width: 250);
+```
+
+### From Laravel Storage
+
+```php
+use Illuminate\Support\Facades\Storage;
+
+$pdf->imageFromDisk(Storage::disk('s3'), 'reports/chart.jpg', width: 400);
+```
+
+`imageFromDisk()` accepts any object with a `get(string $path): ?string` method.
+
+### Image Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `dpi` | float | 72.0 | Image resolution |
+| `align` | string | 'left' | 'left', 'center', or 'right' |
+
+```php
+$pdf->image('/path/to/logo.jpg', width: 150, options: [
+    'align' => 'center',
+    'dpi' => 150,
+]);
+```
+
+Images auto-clamp to the content area and trigger page breaks when they don't fit.
+
+---
+
+## Style & Configuration
+
+### Presets
+
+```php
+$pdf = FlatPdf::make(Style::a4());              // A4 paper (595.28 x 841.89pt)
+$pdf = FlatPdf::make(Style::compact());          // Dense layout, smaller fonts
+$pdf = FlatPdf::make(Style::landscape());        // Landscape letter (792 x 612pt)
+$pdf = FlatPdf::make(Style::landscapeCompact()); // Landscape + compact
+```
+
+### All Parameters
+
+```php
+Style::make(
+    // Page dimensions (72 points = 1 inch)
+    pageWidth: 612,             // Letter width (A4: 595.28)
+    pageHeight: 792,            // Letter height (A4: 841.89)
+    marginTop: 60,
+    marginBottom: 60,
+    marginLeft: 50,
+    marginRight: 50,
+
+    // Body text
+    fontFamily: 'Helvetica',    // 'Times-Roman', 'Courier'
+    fontSize: 9,
+    lineHeight: 1.4,
+    textColor: [0.2, 0.2, 0.2],
+
+    // Headings
+    h1Size: 20,
+    h2Size: 15,
+    h3Size: 12,
+    headingSpaceBefore: 16,
+    headingSpaceAfter: 6,
+    headingColor: [0.1, 0.1, 0.1],
+
+    // Tables
+    tableFontSize: 8,
+    tableCellPadding: 5,
+    tableLineWidth: 0.5,
+    tableHeaderBg: [0.22, 0.40, 0.65],
+    tableHeaderColor: [1.0, 1.0, 1.0],
+    tableHeaderFont: 'Helvetica-Bold',
+    tableRowBg: [1.0, 1.0, 1.0],
+    tableAltRowBg: [0.95, 0.96, 0.98],
+    tableBorderColor: [0.78, 0.80, 0.83],
+    tableStriped: true,
+    tableRepeatHeaderOnNewPage: true,
+
+    // Header / Footer
+    showPageNumbers: true,
+    pageNumberFormat: 'Page {page} of {pages}',
+    headerFooterFontSize: 7,
+    headerFooterColor: [0.5, 0.5, 0.5],
+    headerText: '',
+    footerText: '',
+
+    // Spacing
+    paragraphSpacing: 8,
+
+    // Compression
+    compress: true,
+);
+```
+
+### Colors
+
+Colors use RGB arrays with values from `0.0` to `1.0`.
+
+```php
+[1.0, 0.0, 0.0]    // Red
+[0.0, 0.0, 0.0]    // Black
+[1.0, 1.0, 1.0]    // White
+[0.22, 0.40, 0.65] // Steel blue (default header)
+```
+
+---
+
+## Page Control
+
+### Page Breaks
+
+```php
+$pdf->pageBreak();  // Force a new page
+$pdf->newPage();    // Alias for pageBreak()
+```
+
+### Remaining Space
+
+```php
+$remaining = $pdf->getRemainingSpace(); // Points remaining on current page
+
+if ($remaining < 100) {
+    $pdf->pageBreak();
+}
+```
+
+### Current Page Number
+
+```php
+$page = $pdf->getCurrentPage(); // Returns current page number (1-based)
+```
+
+### Headers & Footers
+
+```php
+$style = Style::make(
+    showPageNumbers: true,
+    pageNumberFormat: 'Page {page} of {pages}',
+    headerText: 'Monthly Report - Q4 2025',
+    footerText: 'Acme Corporation',
+    headerFooterFontSize: 7,
+    headerFooterColor: [0.5, 0.5, 0.5],
+);
+
+$pdf = FlatPdf::make($style);
+```
+
+`{page}` and `{pages}` placeholders are replaced when the PDF is finalized.
+
+---
+
+## Output Methods
+
+### Save to Disk
+
+```php
+$pdf->save('report.pdf');
+$pdf->save('/absolute/path/to/report.pdf');
+```
+
+### Get Raw Bytes
+
+```php
+$bytes = $pdf->output();
+```
+
+### Laravel HTTP Response
+
+```php
+// Download
+return response($pdf->output())
+    ->header('Content-Type', 'application/pdf')
+    ->header('Content-Disposition', 'attachment; filename="report.pdf"');
+
+// Inline (display in browser)
+return response($pdf->output())
+    ->header('Content-Type', 'application/pdf')
+    ->header('Content-Disposition', 'inline; filename="report.pdf"');
+```
+
+### Upload to S3
+
+```php
+Storage::disk('s3')->put('reports/monthly.pdf', $pdf->output());
+```
+
+### Compression
+
+Stream compression is enabled by default (60-70% size reduction). Disable for debugging:
+
+```php
+$pdf = FlatPdf::make(Style::make(compress: false));
+```
+
+JPEG image streams are never double-compressed — they use DCTDecode only.
+
+---
+
+## Full Laravel Example
+
+```php
+use PdfParse\FlatPdf\FlatPdf;
+use PdfParse\FlatPdf\Style;
+use Illuminate\Support\Facades\Storage;
+
+public function generateReport()
+{
+    $pdf = FlatPdf::make(Style::make(
+        headerText: 'Acme Corp — Confidential',
+        showPageNumbers: true,
+    ));
+
+    $pdf->imageFromDisk(Storage::disk('s3'), 'assets/logo.jpg', width: 150);
+
+    $pdf->h1('Monthly Report');
+    $pdf->text('Generated on ' . now()->format('F j, Y'));
+
+    $pdf->dataTable(Order::all()->toArray(), [
+        'columns' => ['id', 'customer', 'total', 'created_at'],
+        'columnLabels' => ['created_at' => 'Date', 'total' => 'Amount'],
+        'formatters' => [
+            'total' => fn($v) => '$' . number_format($v / 100, 2),
+            'created_at' => fn($v) => Carbon::parse($v)->format('M j, Y'),
+        ],
+        'columnAligns' => ['left', 'left', 'right', 'center'],
+    ]);
+
+    Storage::disk('s3')->put('reports/monthly.pdf', $pdf->output());
+
+    return response($pdf->output())
+        ->header('Content-Type', 'application/pdf');
+}
+```

@@ -1,0 +1,25 @@
+# FlatPDF
+
+> A flat, zero-dependency PHP PDF writer built for speed and large documents.
+
+FlatPDF writes PDF operators directly — no HTML parsing, no CSS engine, no external binaries. It is designed for table-heavy reports with hundreds or thousands of rows.
+
+- Package: `pdfparse/flatpdf`
+- Requires: PHP 8.2+
+- License: MIT
+- Docs: https://flatpdf.pdfparse.co/
+
+## Docs
+
+- [Getting Started](https://flatpdf.pdfparse.co/getting-started): Installation, quick start, `FlatPdf::make()` factory
+- [Text & Headings](https://flatpdf.pdfparse.co/text-and-headings): `h1()`, `h2()`, `h3()`, `text()`, `bold()`, `italic()`, `code()`, `hr()`, `space()`
+- [Tables](https://flatpdf.pdfparse.co/tables): `table()` with auto-sizing columns, alignment, striping, page-break headers, `summaryRow()`
+- [Data Tables](https://flatpdf.pdfparse.co/data-tables): `dataTable()` for associative arrays and Eloquent collections with formatters
+- [Images](https://flatpdf.pdfparse.co/images): `image()`, `imageFromString()`, `imageFromDisk()` — JPEG only
+- [Style & Configuration](https://flatpdf.pdfparse.co/style-and-configuration): `Style::make()` with presets (`a4()`, `compact()`, `landscape()`, `landscapeCompact()`)
+- [Page Control](https://flatpdf.pdfparse.co/page-control): `pageBreak()`, `getRemainingSpace()`, `getCurrentPage()`, headers/footers
+- [Output Methods](https://flatpdf.pdfparse.co/output-methods): `save()`, `output()`, Laravel responses, S3 uploads, compression
+
+## Full docs
+
+For the complete API reference with all code examples, see [llms-full.txt](https://raw.githubusercontent.com/pdfparse/flatpdf/main/llms-full.txt).

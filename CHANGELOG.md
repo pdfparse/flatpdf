@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com), and this project adheres to [Semantic Versioning](https://semver.org).
 
+## [0.1.5] - 2025-02-14
+
+### Added
+
+- Documentation site with dedicated pages for getting started, text and headings, tables, data tables, images, page control, output methods, and style configuration
+- `llms.txt` and `llms-full.txt` for LLM-friendly package documentation
+- `docs/`, `llms.txt`, and `llms-full.txt` to `.gitattributes` export-ignore
+
 ## [0.1.4] - 2025-02-13
 
 ### Changed

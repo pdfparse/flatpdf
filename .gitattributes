@@ -1,7 +1,10 @@
 # Files excluded from distribution archives (Packagist)
 /.github/               export-ignore
+/docs/                  export-ignore
 /tests/                 export-ignore
 /demo.php               export-ignore
+/llms.txt               export-ignore
+/llms-full.txt          export-ignore
 /phpunit.xml            export-ignore
 /phpstan.neon           export-ignore
 /CHANGELOG.md           export-ignore
